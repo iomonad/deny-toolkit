@@ -1,5 +1,6 @@
 # Dény Toolkit
-![](https://media.lesechos.com/api/v1/images/view/5bf40c483e454650f565a21b/1280x720-webp/2213330-deny-security-blinde-ses-serrures-grace-a-la-poudre-de-metal-web-tete-0302385720550.webp | width=100)
+
+![](https://assets.catawiki.nl/assets/2019/2/1/b/a/0/ba0fb376-d709-48ce-ad37-48669ce6e3f3.jpg)
 
 Key Feature:
 - The strongest capacity for combinations on the market
