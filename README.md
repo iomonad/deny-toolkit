@@ -23,7 +23,6 @@ TODO
 ## 3: Fuzzer (collision search)
 TODO
 
-
 ### Disclaimer
 
 This project is not affiliated with the Dény trademark and

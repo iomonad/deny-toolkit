@@ -1,0 +1,2 @@
+* TODO Create key combinason saver with Gui
+* TODO Create Description file to OpenScad converter
