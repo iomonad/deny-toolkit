@@ -17,12 +17,31 @@ Descriptor::Descriptor(std::string fname) {
 	}
 }
 
+Descriptor::~Descriptor() {
+	//
+	// TODO: Maybe try to find a smarter
+	// way to free up memory ?
+	//
+	cv::destroyAllWindows();
+}
+
 //
 // @desc Start Activity flow
 //
 
 void Descriptor::start_activity() {
-	cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE);
+	char k;
+
+	cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_GUI_EXPANDED);
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
-	cv::waitKey(0);
+	for (;;) {
+		cv::imshow(DESCRIPTOR_WIN_NAME, image);
+		k = cv::waitKey(0);
+		if (k == 'r') {
+			cv::rotate(image, image, cv::ROTATE_90_CLOCKWISE);
+		}
+		if (k == 'q') {
+			break;
+		}
+	}
 }

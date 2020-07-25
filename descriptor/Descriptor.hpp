@@ -23,7 +23,9 @@ private:
 	cv::Mat image;
 public:
 	Descriptor(std::string fname);
+	~Descriptor();
 	void start_activity();
+	
 };
 
 
