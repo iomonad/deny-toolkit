@@ -1,10 +1,20 @@
+#
+# (c) 2020 iomonad - <iomonad@riseup.net>
+# See: https://github.com/iomonad/deny-toolkit
+#
+
 CC = c++
 CFLAGS = -g -Wall
-SRCS = Descriptor.cpp
-PROG = deny-descriptor
+SRCS = main.cpp Descriptor.cpp Arguments.cpp
+TARGET = deny-descriptor
 
 OPENCV = `pkg-config opencv4 --cflags --libs`
 LIBS = $(OPENCV)
 
-$(PROG):$(SRCS)
-	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
+$(TARGET):$(SRCS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
+
+clean:
+	@rm -f $(TARGET)
+
+.PHONY: clean

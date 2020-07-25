@@ -1,7 +1,12 @@
-#include <iostream>
+//
+// (c) 2020 iomonad - <iomonad@riseup.net>
+// See: https://github.com/iomonad/deny-toolkit
+//
 
-int main(int argc, char *argv[])
-{
-	std::cout << "Hello World" << std::endl;
-	return 0;
+#include <string.h>
+
+#include "Descriptor.hpp"
+
+Descriptor::Descriptor(const std::string fname) {
+	;
 }
