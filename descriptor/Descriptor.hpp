@@ -9,14 +9,21 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-using namespace cv;
-using namespace std;
+# define DESCRIPTOR_WIN_NAME "Dény Descriptor"
+
+//
+// @description Descriptor Class.
+//     Manage the lifecycle of user
+//     input on the given image.
+// @args fname Input image path
+//
 
 class Descriptor {
 private:
-	Mat image;
+	cv::Mat image;
 public:
-	Descriptor(const std::string fname);
+	Descriptor(std::string fname);
+	void start_activity();
 };
 
 
