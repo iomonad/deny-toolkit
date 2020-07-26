@@ -9,7 +9,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-# define DESCRIPTOR_WIN_NAME "Dény Descriptor"
+# define DESCRIPTOR_WIN_NAME "image"
 
 //
 // @description Descriptor Class.
@@ -21,10 +21,16 @@
 class Descriptor {
 private:
     cv::Mat image;
+    static void mousekb(int ev, int x, int y, int f, void* data);
+    // Flow Components
+    void initial_closeup(std::function<void(std::string)> failure,
+			 std::function<void()> success);
+    void combinaison_capture(std::function<void(std::string)> failure,
+			     std::function<void()> success);
 public:
     Descriptor(std::string fname);
     ~Descriptor();
-    void start_activity();
+    void start_activity(int flow = 0);
 };
 
 

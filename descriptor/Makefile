@@ -4,14 +4,15 @@
 #
 
 CC = c++
-CFLAGS = -g -Wall
+STD = gnu++11
+CFLAGS = -g -Wall -std=$(STD)
 SRCS = main.cpp Descriptor.cpp Arguments.cpp
 TARGET = deny-descriptor
 
 OPENCV = `pkg-config opencv4 --cflags --libs`
 LIBS = $(OPENCV)
 
-$(TARGET):$(SRCS)
+$(TARGET): $(SRCS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
 
 clean:
