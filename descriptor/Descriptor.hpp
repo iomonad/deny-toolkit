@@ -20,12 +20,11 @@
 
 class Descriptor {
 private:
-	cv::Mat image;
+    cv::Mat image;
 public:
-	Descriptor(std::string fname);
-	~Descriptor();
-	void start_activity();
-	
+    Descriptor(std::string fname);
+    ~Descriptor();
+    void start_activity();
 };
 
 

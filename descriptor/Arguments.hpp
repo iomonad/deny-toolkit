@@ -12,11 +12,11 @@
 
 class ArgsParser {
 private:
-	// Internal argument map
-	std::map<std::string, std::string> argmap;
+    // Internal argument map
+    std::map<std::string, std::string> argmap;
 public:
-	std::string retrieve(std::string flag);
-	ArgsParser(const char *argv[], int argc);
+    std::string retrieve(std::string flag);
+    ArgsParser(const char *argv[], int argc);
 };
 
 #endif /* ARGUMENTS_HPP */
