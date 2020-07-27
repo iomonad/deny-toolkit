@@ -20,7 +20,6 @@
 
 class Descriptor {
 private:
-    cv::Mat image;
     // Flow Components
     void initial_closeup(std::function<void(std::string)> failure,
 			 std::function<void()> success);
@@ -31,6 +30,13 @@ public:
     ~Descriptor();
     void start_activity(int flow = 0);
 };
+
+// PLEASE NEVER DO THIS
+
+namespace DescriptorScope {
+    static cv::Mat image;
+    static cv::Mat image_stock;
+}
 
 
 #endif	/* DESCRIPTOR_HPP */

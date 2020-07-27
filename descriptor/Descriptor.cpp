@@ -10,9 +10,13 @@
 
 #include "Descriptor.hpp"
 
+using namespace DescriptorScope;
+
 Descriptor::Descriptor(std::string fname) {
     image = cv::imread(fname, cv::IMREAD_GRAYSCALE);
 
+    // Deep Stock Copy
+    image.copyTo(image_stock);
     if(!image.data) {
 	throw std::runtime_error("Unable to load image.");
     }
@@ -37,6 +41,10 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
         switch (ev) {
 	case cv::EVENT_LBUTTONDOWN:
+	    // Dummy click reset
+	    image_stock.copyTo(image);
+	    std::get<0>(closeup) = cv::Point(0, 0);
+	    std::get<1>(closeup) = cv::Point(0, 0);
 	    std::get<0>(closeup) = cv::Point(x, y);
 	    break;
 	case cv::EVENT_LBUTTONUP:
@@ -47,24 +55,40 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 	    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
 	    // Draw Closeup
 	    cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
-			  cv::Scalar(0, 255, 0));
+			  cv::Scalar(0, 255, 0), 3);
 	}
     });
-    cv::imshow(DESCRIPTOR_WIN_NAME, image);
+
+    //
+    // Important: Correct Key orientation should be done
+    // before populating the key combinaison !
+    //
 
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
-	k = cv::waitKey(0);
-	if (k == 'r')
+	k = cv::waitKey(100);
+	if (k == 'r') {
 	    cv::rotate(image, image, cv::ROTATE_90_CLOCKWISE);
-	if (k == 'c')
+	    image.copyTo(image_stock);
+	}
+	if (k == 'c') {
 	    cv::rotate(image, image, -10);
-	if (k == 'f')
+	    image.copyTo(image_stock);
+	}
+	if (k == 'f') {
 	    cv::flip(image, image, 1);
-	if (k == 'F')
+	    image.copyTo(image_stock);
+	}
+	if (k == 'F') {
 	    cv::flip(image, image, 0);
-	if (k == 'q')
+	    image.copyTo(image_stock);
+	}
+        if (k == 'q') {
+	    cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
+
+	    image = image(roi);
 	    break;
+	}
     }
     return success();
 }
@@ -78,7 +102,7 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
 	return ;
     });
-    cv::imshow(DESCRIPTOR_WIN_NAME, image);
+
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
 	k = cv::waitKey(0);
