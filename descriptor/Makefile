@@ -4,7 +4,7 @@
 #
 
 CC = c++
-STD = gnu++11
+STD = gnu++14
 CFLAGS = -g -Wall -std=$(STD)
 SRCS = main.cpp Descriptor.cpp Arguments.cpp
 TARGET = deny-descriptor

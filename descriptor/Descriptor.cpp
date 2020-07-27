@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <opencv2/core/core.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
 
 #include "Descriptor.hpp"
@@ -25,27 +26,32 @@ Descriptor::~Descriptor() {
     cv::destroyAllWindows();
 }
 
-//
-// @desc Mouse Event Callback logic
-//
-
-void Descriptor::mousekb(int ev, int x, int y,
-			 int f, void* data) {
-    switch (ev) {
-    case cv::EVENT_LBUTTONDOWN:
-	std::cout << "Left button of the mouse is clicked - position ("
-		  << x << ", " << y << ")" << std::endl;
-	break;
-    }
-}
-
 void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 				 std::function<void()> success) {
     char k;
 
+    static std::tuple<cv::Point, cv::Point> closeup
+	= std::make_tuple(cv::Point(0,0), cv::Point(0,0));
+
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
-    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, mousekb);
+    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
+        switch (ev) {
+	case cv::EVENT_LBUTTONDOWN:
+	    std::get<0>(closeup) = cv::Point(x, y);
+	    break;
+	case cv::EVENT_LBUTTONUP:
+	    std::get<1>(closeup) = cv::Point(x, y);
+	    break;
+	}
+	if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
+	    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
+	    // Draw Closeup
+	    cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
+			  cv::Scalar(0, 255, 0));
+	}
+    });
     cv::imshow(DESCRIPTOR_WIN_NAME, image);
+
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
 	k = cv::waitKey(0);
@@ -63,12 +69,15 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
     return success();
 }
 
+
 void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
     char k;
 
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
-    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, mousekb);
+    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
+	return ;
+    });
     cv::imshow(DESCRIPTOR_WIN_NAME, image);
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
@@ -114,7 +123,7 @@ void Descriptor::start_activity(int flow) {
 	    return (this->start_activity(flow + 1));
 	});
     } else {
-	// Maybe cleanup support ?
+	image.release();
 	return ;
     }
 }

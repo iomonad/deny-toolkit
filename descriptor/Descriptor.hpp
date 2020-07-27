@@ -21,7 +21,6 @@
 class Descriptor {
 private:
     cv::Mat image;
-    static void mousekb(int ev, int x, int y, int f, void* data);
     // Flow Components
     void initial_closeup(std::function<void(std::string)> failure,
 			 std::function<void()> success);
