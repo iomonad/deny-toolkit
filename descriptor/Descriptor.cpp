@@ -125,14 +125,27 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 	    // X Should be the same when Y Increment
 	    // Y Should be the same when X Increment
 	    //
-	    if (combinaison.size() > 1) {
+	    if (combinaison.size() >= 1) {
 		cv::Point last = combinaison.back();
 
 		if (select.x < last.x) {
 		    // Select should be X Progressive
 		    select.x = last.x;
+		    break;
 		}
 
+		if ((select.y != last.y)) {
+		    if (select.x != last.x) {
+			select.x = last.x;
+		    }
+		}
+
+	        if ((select.x != last.x)) {
+		    if (select.y != last.y) {
+			select.y = last.y;
+		    }
+		}
+		std::cout << select << std::endl;
 		cv::line(image, last, select, cv::Scalar(0, 254, 0), 2);
 	    }
 	    combinaison.push_back(select);
@@ -143,11 +156,31 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
 	k = cv::waitKey(100);
+	if (k == 0x20) {
+	    // Commit bitting
+	    bitting.assign(combinaison.begin(), combinaison.end()); 
+	    break;
+	}
+    }
+    return success();
+}
+
+
+void Descriptor::bitting_preview(std::function<void(std::string)> failure,
+				     std::function<void()> success) {
+    char k;
+
+    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
+
+    for (;;) {
+	cv::imshow(DESCRIPTOR_WIN_NAME, image);
+	k = cv::waitKey(100);
 	if (k == 0x20)
 	    break;
     }
     return success();
 }
+
 
 //
 // @desc Lambda throw helper, maybe useful to add
@@ -169,6 +202,7 @@ void Descriptor::start_activity(int flow) {
 	 std::function<void()>) = {
 	&Descriptor::initial_closeup,
 	&Descriptor::combinaison_capture,
+	&Descriptor::bitting_preview,
     };
     static constexpr int n_func =
         sizeof(flow_func) / sizeof(*flow_func);

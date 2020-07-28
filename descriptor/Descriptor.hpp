@@ -20,11 +20,15 @@
 
 class Descriptor {
 private:
+    // Bitting
+    std::vector<cv::Point> bitting;
     // Flow Components
     void initial_closeup(std::function<void(std::string)> failure,
 			 std::function<void()> success);
     void combinaison_capture(std::function<void(std::string)> failure,
 			     std::function<void()> success);
+    void bitting_preview(std::function<void(std::string)> failure,
+			 std::function<void()> success);
 public:
     Descriptor(std::string fname);
     ~Descriptor();
@@ -37,6 +41,5 @@ namespace DescriptorScope {
     static cv::Mat image;
     static cv::Mat image_stock;
 }
-
 
 #endif	/* DESCRIPTOR_HPP */
