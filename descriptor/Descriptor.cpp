@@ -30,6 +30,12 @@ Descriptor::~Descriptor() {
     cv::destroyAllWindows();
 }
 
+//
+// @desc First step in the pipeline, properly setup
+//       image orientation in order to have a nice constistency
+//       for next step.
+//
+
 void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 				 std::function<void()> success) {
     char k;
@@ -83,36 +89,61 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 	    cv::flip(image, image, 0);
 	    image.copyTo(image_stock);
 	}
-        if (k == 'q') {
-	    cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
+        if (k == 0x20) {
+	    // Only if closeup is setup
+	    if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
+		std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
+		cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
 
-	    image = image(roi);
-	    break;
+		image = image(roi);
+		break;
+	    }
 	}
     }
     return success();
 }
 
+//
+// @desc Gather correct combinaison by placing dots
+//       on combinaison edges.
+//
 
 void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
     char k;
 
+    static std::vector<cv::Point> combinaison;
+
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
-	return ;
+        switch (ev) {
+	case cv::EVENT_LBUTTONDOWN:
+	    cv::Point select(x, y);
+
+	    // @@ CONSISTENCY RULES @@
+	    // NX Should never < than LX
+	    // X Should be the same when Y Increment
+	    // Y Should be the same when X Increment
+	    //
+	    if (combinaison.size() > 1) {
+		cv::Point last = combinaison.back();
+
+		if (select.x < last.x) {
+		    // Select should be X Progressive
+		    select.x = last.x;
+		}
+
+		cv::line(image, last, select, cv::Scalar(0, 254, 0), 2);
+	    }
+	    combinaison.push_back(select);
+	    break;
+	}
     });
 
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
-	k = cv::waitKey(0);
-	if (k == 'r')
-	    cv::rotate(image, image, cv::ROTATE_90_CLOCKWISE);
-	if (k == 'f')
-	    cv::flip(image, image, 1);
-	if (k == 'F')
-	    cv::flip(image, image, 0);
-	if (k == 'q')
+	k = cv::waitKey(100);
+	if (k == 0x20)
 	    break;
     }
     return success();
