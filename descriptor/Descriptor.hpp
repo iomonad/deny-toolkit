@@ -9,6 +9,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "Commons.hpp"
+
 # define DESCRIPTOR_WIN_NAME "image"
 
 //
@@ -21,7 +23,7 @@
 class Descriptor {
 private:
     // Bitting
-    std::vector<cv::Point> bitting;
+    bitting_t bitting;
     // Flow Components
     void initial_closeup(std::function<void(std::string)> failure,
 			 std::function<void()> success);
@@ -33,6 +35,7 @@ public:
     Descriptor(std::string fname);
     ~Descriptor();
     void start_activity(int flow = 0);
+    bitting_t get_bitting();
 };
 
 // PLEASE NEVER DO THIS

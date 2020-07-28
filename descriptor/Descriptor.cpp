@@ -8,6 +8,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui.hpp>
 
+#include "Commons.hpp"
 #include "Descriptor.hpp"
 
 using namespace DescriptorScope;
@@ -43,8 +44,10 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
     static std::tuple<cv::Point, cv::Point> closeup
 	= std::make_tuple(cv::Point(0,0), cv::Point(0,0));
 
-    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
-    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
+    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
+		    | cv::WINDOW_GUI_NORMAL);
+    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
+			 (int ev, int x, int y, int f, void *data) {
         switch (ev) {
 	case cv::EVENT_LBUTTONDOWN:
 	    // Dummy click reset
@@ -112,10 +115,12 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
     char k;
 
-    static std::vector<cv::Point> combinaison;
+    static bitting_t combinaison;
 
-    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
-    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, [](int ev, int x, int y, int f, void *data) {
+    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
+		    | cv::WINDOW_GUI_NORMAL);
+    cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
+			 (int ev, int x, int y, int f, void *data) {
         switch (ev) {
 	case cv::EVENT_LBUTTONDOWN:
 	    cv::Point select(x, y);
@@ -158,29 +163,50 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 	k = cv::waitKey(100);
 	if (k == 0x20) {
 	    // Commit bitting
-	    bitting.assign(combinaison.begin(), combinaison.end()); 
+	    bitting.assign(combinaison.begin(), combinaison.end());
 	    break;
 	}
     }
     return success();
 }
 
+//
+// @desc Show bitting selection preview in
+//       another windows
+//
 
 void Descriptor::bitting_preview(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
     char k;
 
-    cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
+    cv::namedWindow(DESCRIPTOR_WIN_NAME,
+		    cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
 
+    static cv::Mat preview = cv::Mat(cv::Size(image.cols, image.rows),
+				     CV_8UC3, cv::Scalar(0, 0, 0));
+    for (std::size_t i = 0; i < bitting.size(); ++i) {
+	if ((i + 1) != bitting.size()) {
+	    cv::line(preview, bitting[i], bitting[i+1],
+		     cv::Scalar(0, 254, 0), 2);
+	}
+    }
     for (;;) {
-	cv::imshow(DESCRIPTOR_WIN_NAME, image);
+	cv::imshow(DESCRIPTOR_WIN_NAME, preview);
 	k = cv::waitKey(100);
 	if (k == 0x20)
 	    break;
     }
+    preview.release();
     return success();
 }
 
+//
+// @desc Getter for Activity Result
+//
+
+bitting_t Descriptor::get_bitting(void) {
+    return bitting;
+}
 
 //
 // @desc Lambda throw helper, maybe useful to add
