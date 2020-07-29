@@ -32,10 +32,10 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
 			std::function<void()> success) {
 
     cv::Point genese = _bitting.front();
+
+    // Maybe logic should be hardened ?
     for (auto &variation : _bitting) {
 	variation.x -= genese.x;
-	variation.y -= genese.y;
-	std::cout << variation << std::endl;
     }
 }
 

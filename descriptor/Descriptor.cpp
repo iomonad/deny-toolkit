@@ -148,7 +148,8 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 
 		if (select.x < last.x) {
 		    // Select should be X Progressive
-		    select.x = last.x;
+		    //select.x = last.x;
+		    break;
 		}
 
 		if ((select.y != last.y)) {
