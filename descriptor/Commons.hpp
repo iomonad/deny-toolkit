@@ -12,4 +12,11 @@
 // Bitting Data Structure
 typedef std::vector<cv::Point> bitting_t;
 
+// Key descriptor
+#pragma pack(push, 1)
+struct Key {
+    std::size_t MAGIC;
+};
+#pragma pack(pop)
+
 #endif /* COMMONS_H */

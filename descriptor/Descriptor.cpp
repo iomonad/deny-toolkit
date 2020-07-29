@@ -32,6 +32,19 @@ Descriptor::~Descriptor() {
 }
 
 //
+// Drawing Helper
+//
+
+static void redraw_selection(cv::Mat mat, std::vector<cv::Point> bitting) {
+    for (std::size_t i = 0; i < bitting.size(); ++i) {
+	if ((i + 1) != bitting.size()) {
+	    cv::line(mat, bitting[i], bitting[i+1],
+		     cv::Scalar(0, 254, 0), 2);
+	}
+    }
+}
+
+//
 // @desc First step in the pipeline, properly setup
 //       image orientation in order to have a nice constistency
 //       for next step.
@@ -118,7 +131,7 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
     static bitting_t combinaison;
 
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
-		    | cv::WINDOW_GUI_NORMAL);
+		    | cv::WINDOW_GUI_EXPANDED);
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
 			 (int ev, int x, int y, int f, void *data) {
         switch (ev) {
@@ -136,24 +149,22 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 		if (select.x < last.x) {
 		    // Select should be X Progressive
 		    select.x = last.x;
-		    break;
 		}
 
 		if ((select.y != last.y)) {
-		    if (select.x != last.x) {
+		    if (select.x > last.x) {
 			select.x = last.x;
 		    }
 		}
 
 	        if ((select.x != last.x)) {
-		    if (select.y != last.y) {
+		    if (select.y > last.y) {
 			select.y = last.y;
 		    }
 		}
-		std::cout << select << std::endl;
-		cv::line(image, last, select, cv::Scalar(0, 254, 0), 2);
 	    }
 	    combinaison.push_back(select);
+	    redraw_selection(image, combinaison);
 	    break;
 	}
     });
@@ -161,11 +172,18 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, image);
 	k = cv::waitKey(100);
+	if (k == 'b') {
+	    combinaison.pop_back();
+	}
+	if (k == 'r') {
+	    combinaison.clear();
+	}
 	if (k == 0x20) {
 	    // Commit bitting
 	    bitting.assign(combinaison.begin(), combinaison.end());
 	    break;
 	}
+	redraw_selection(image, combinaison);
     }
     return success();
 }
@@ -184,12 +202,7 @@ void Descriptor::bitting_preview(std::function<void(std::string)> failure,
 
     static cv::Mat preview = cv::Mat(cv::Size(image.cols, image.rows),
 				     CV_8UC3, cv::Scalar(0, 0, 0));
-    for (std::size_t i = 0; i < bitting.size(); ++i) {
-	if ((i + 1) != bitting.size()) {
-	    cv::line(preview, bitting[i], bitting[i+1],
-		     cv::Scalar(0, 254, 0), 2);
-	}
-    }
+    redraw_selection(preview, bitting);
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, preview);
 	k = cv::waitKey(100);

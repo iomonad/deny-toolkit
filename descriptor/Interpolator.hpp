@@ -15,10 +15,15 @@
 class Interpolator {
 private:
     std::ofstream target;
+    bitting_t _bitting;
+
+    // Flow Components
+    void regularize_bitting(std::function<void(std::string)> failure,
+			    std::function<void()> success);
 public:
     Interpolator(std::string path, bitting_t bitting);
     ~Interpolator();
-    void pack();
+    void pack(int flow = 0);
 };
 
 #endif /* INTERPOLATOR_H */
