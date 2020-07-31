@@ -12,8 +12,10 @@ module base_handle () {
             circle(d=16);
         }
         // Renforcement Sphere
-        translate([0,14.7,0])
-        sphere(r=5.09);
+        translate([0,14,0]) {
+             scale([1.5,1.2,1])
+             sphere(r=5.09);
+        }
     }
     
     main();
