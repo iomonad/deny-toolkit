@@ -8,13 +8,13 @@
 namespace Implicits {
 
     // WRITER
-    std::ostream& operator<<(std::ostream &os, const Key &key) {
+    std::ostream& operator<<(std::ostream &os, const KeyHeader &key) {
 	os << key.MAGIC;
 	return os;
     }
 
     // READER
-    std::istream& operator>>(std::istream &is, Key &key) {
+    std::istream& operator>>(std::istream &is, KeyHeader &key) {
 	is >> key.MAGIC;
 	return is;
     }
