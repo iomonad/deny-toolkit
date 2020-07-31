@@ -6,10 +6,12 @@
 module base_handle () {
     
     module main () {
-        scale([2,1,10])
+        scale([1.5,1,10])
         difference () {
             circle(d=30);
-            circle(d=16);
+            translate([0, -1, 0]) {
+                circle(d=20);
+            }
         }
         // Renforcement Sphere
         translate([0,14,0]) {
@@ -20,3 +22,5 @@ module base_handle () {
     
     main();
 }
+
+base_handle();
