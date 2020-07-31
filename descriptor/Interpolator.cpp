@@ -74,6 +74,7 @@ void Interpolator::craft_file(std::function<void(std::string)> failure,
 	    (unsigned short)b.x,
 	    (unsigned short)b.y
 	};
+	std::cout << b << std::endl;
 	target.write((char*)&body, sizeof(struct KeyBody));
     }
     std::cout << "Succesfully saved key '" << combiname << "'" << std::endl;
@@ -104,7 +105,6 @@ void Interpolator::pack(int flow) {
 	    return (this->pack(flow + 1));
 	});
     } else {
-	
 	target.close();
 	return ;
     }
