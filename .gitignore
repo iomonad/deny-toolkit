@@ -39,3 +39,4 @@
 # End of https://www.toptal.com/developers/gitignore/api/c++
 descriptor/deny-descriptor
 descriptor/foo
+dumper/deny-dumpinfo

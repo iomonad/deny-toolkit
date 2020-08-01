@@ -17,7 +17,7 @@ using namespace std;
 static inline void
 print_usage_die(const string av) {
     cerr << "Usage: " << av
-	 << " -i <input image> -o <output file>]" << endl;
+	 << " -i <input image> [-o <output file>]" << endl;
     exit(EXIT_FAILURE);
 }
 
