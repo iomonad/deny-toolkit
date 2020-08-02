@@ -22,9 +22,7 @@ module blank_bitting() {
     }
 }
 
-module protected_blank_sample() () {
+module protected_blank_sample() {
     protected_base ();
     blank_bitting();
 }
-
-protected_blank_sample ();
