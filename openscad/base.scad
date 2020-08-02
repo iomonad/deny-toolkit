@@ -22,5 +22,3 @@ module base_handle () {
     
     main();
 }
-
-base_handle();
