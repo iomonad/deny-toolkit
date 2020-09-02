@@ -1,5 +1,9 @@
 # Dény Toolkit
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/iomonad/deny-toolkit/master/.github/scad_gen.png?token=ADKNHH5MF7QDBGNLNNQH2GK7LDDTS">
+</p>
+
 `deny-toolkit` is a small project that contains various tools for archiving, visualization and fuzzing purposes of Dény® key bitting.
 
 ## Repo structure 
