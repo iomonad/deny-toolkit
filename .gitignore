@@ -40,3 +40,4 @@
 descriptor/deny-descriptor
 descriptor/foo
 dumper/deny-dumpinfo
+openscad/deny-generate
