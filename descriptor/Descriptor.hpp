@@ -26,7 +26,7 @@ class Descriptor {
 private:
     // Bitting
     bitting_t bitting;
-    std::list<cv::Rect> levers;
+    std::vector<cv::Rect> levers;
 
     // Flow Components
     void initial_closeup(std::function<void(std::string)> failure,
@@ -42,7 +42,7 @@ public:
     ~Descriptor();
     void start_activity(int flow = 0);
     bitting_t get_bitting();
-    std::list<cv::Rect> get_levers();
+    std::vector<cv::Rect> get_levers();
 };
 
 // PLEASE NEVER DO THIS

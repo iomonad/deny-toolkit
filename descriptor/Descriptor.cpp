@@ -44,6 +44,12 @@ static void redraw_selection(cv::Mat mat, std::vector<cv::Point> bitting) {
     }
 }
 
+static void draw_levers(cv::Mat mat, std::vector<cv::Rect> levers) {
+	for (std::size_t i = 0; i < levers.size(); ++i) {
+		cv::rectangle(image, levers.at(i), cv::Scalar(255, 255, 0), 1);
+	}
+}
+
 static void log_wrapper(std::string step, std::string message) {
 	std::cout << "[ " << step << " ] - " << message << "." << std::endl;
 }
@@ -117,6 +123,7 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 		cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
 
 		image = image(roi);
+		image.copyTo(image_stock);
 		break;
 	    }
 	}
@@ -240,11 +247,12 @@ void Descriptor::levers_disposition(std::function<void(std::string)> failure,
 				if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
 				    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
 					cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
-					levers.push_front(roi);
+					levers.push_back(roi);
 					cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
 						      cv::Scalar(0, 255, 0), 3);
+					image.copyTo(image_stock);
 					levers_count++;
-					log_wrapper("Levers Disposition", "Levers added !");
+					log_wrapper("Levers Disposition", "Levers added");
 					break;
 				}
 				closeup = std::make_tuple(cv::Point(0,0), cv::Point(0,0));
@@ -269,6 +277,7 @@ void Descriptor::bitting_preview(std::function<void(std::string)> failure,
 		    cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
     log_wrapper("Bitting Preview", "Is the bitting correct ? Press enter to continue");
     redraw_selection(preview, bitting);
+    draw_levers(preview, levers);
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, preview);
 	k = cv::waitKey(100);
@@ -292,7 +301,7 @@ bitting_t Descriptor::get_bitting(void) {
 // @desc Getter for Activity Results
 //
 
-std::list<cv::Rect> Descriptor::get_levers(void) {
+std::vector<cv::Rect> Descriptor::get_levers(void) {
 	return levers;
 }
 
