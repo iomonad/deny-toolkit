@@ -36,9 +36,9 @@ main(int argc, const char *argv[]) {
     try {
 	descriptor->start_activity();
         bitting_t bitting = descriptor->get_bitting();
-
+	std::vector<cv::Rect> levers = descriptor->get_levers();
 	auto interpolator = make_shared<Interpolator>(
-	    output->c_str(), bitting);
+	      output->c_str(), bitting, levers);
 
 	interpolator->pack();
     } catch (const std::exception& ex) {

@@ -46,7 +46,7 @@ static void redraw_selection(cv::Mat mat, std::vector<cv::Point> bitting) {
 
 static void draw_levers(cv::Mat mat, std::vector<cv::Rect> levers) {
 	for (std::size_t i = 0; i < levers.size(); ++i) {
-		cv::rectangle(image, levers.at(i), cv::Scalar(255, 255, 0), 1);
+		cv::rectangle(mat, levers.at(i), cv::Scalar(20, 100, 100), 3);
 	}
 }
 

@@ -19,6 +19,15 @@ struct KeyHeader {
 };
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+struct KeyLever {
+	unsigned short x;
+	unsigned short y;
+	unsigned short width;
+	unsigned short height;
+};
+#pragma pack(pop)
+
 // Key Descriptor Body
 #pragma pack(push, 1)
 struct KeyBody {
