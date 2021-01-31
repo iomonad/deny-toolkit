@@ -44,6 +44,10 @@ static void redraw_selection(cv::Mat mat, std::vector<cv::Point> bitting) {
     }
 }
 
+static void log_wrapper(std::string step, std::string message) {
+	std::cout << "[ " << step << " ] - " << message << "." << std::endl;
+}
+
 //
 // @desc First step in the pipeline, properly setup
 //       image orientation in order to have a nice constistency
@@ -57,6 +61,7 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
     static std::tuple<cv::Point, cv::Point> closeup
 	= std::make_tuple(cv::Point(0,0), cv::Point(0,0));
 
+    log_wrapper("Initial closeup", "Please select a closeup of your AOI.");
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
 		    | cv::WINDOW_GUI_NORMAL);
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
@@ -76,7 +81,7 @@ void Descriptor::initial_closeup(std::function<void(std::string)> failure,
 	if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
 	    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
 	    // Draw Closeup
-	    cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
+		cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
 			  cv::Scalar(0, 255, 0), 3);
 	}
     });
@@ -130,6 +135,7 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 
     static bitting_t combinaison;
 
+    log_wrapper("Combinaison Catpure", "Please select perfectly the key bitting.");
     cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
 		    | cv::WINDOW_GUI_EXPANDED);
     cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
@@ -190,6 +196,65 @@ void Descriptor::combinaison_capture(std::function<void(std::string)> failure,
 }
 
 //
+// @desc retrieve levers disposition as 2d rectangles
+//
+
+void Descriptor::levers_disposition(std::function<void(std::string)> failure,
+				    std::function<void()> success) {
+
+	char k;
+	size_t levers_count = 0;
+	static std::tuple<cv::Point, cv::Point> closeup
+		= std::make_tuple(cv::Point(0,0), cv::Point(0,0));
+
+	log_wrapper("Levers Disposition", "Please select the 3 levers as AOI.");
+	cv::namedWindow(DESCRIPTOR_WIN_NAME, cv::WINDOW_AUTOSIZE
+			| cv::WINDOW_GUI_NORMAL);
+	cv::setMouseCallback(DESCRIPTOR_WIN_NAME, []
+			     (int ev, int x, int y, int f, void *data) {
+		switch (ev) {
+		case cv::EVENT_LBUTTONDOWN:
+			// Dummy click reset
+			image_stock.copyTo(image);
+			std::get<0>(closeup) = cv::Point(0, 0);
+			std::get<1>(closeup) = cv::Point(0, 0);
+			std::get<0>(closeup) = cv::Point(x, y);
+			break;
+		case cv::EVENT_LBUTTONUP:
+			std::get<1>(closeup) = cv::Point(x, y);
+			break;
+		}
+		if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
+		    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
+			// Draw Closeup
+			cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
+				      cv::Scalar(0, 255, 0), 3);
+		}
+	});
+	while (levers_count < 3) {
+		for (;;) {
+			cv::imshow(DESCRIPTOR_WIN_NAME, image);
+			k = cv::waitKey(100);
+			if (k == 0x20) {
+				// Only if closeup is setup
+				if (std::get<0>(closeup).x != 0 && std::get<0>(closeup).y != 0 &&
+				    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
+					cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
+					levers.push_front(roi);
+					cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
+						      cv::Scalar(0, 255, 0), 3);
+					levers_count++;
+					log_wrapper("Levers Disposition", "Levers added !");
+					break;
+				}
+				closeup = std::make_tuple(cv::Point(0,0), cv::Point(0,0));
+			}
+		}
+	}
+	return success();
+}
+
+//
 // @desc Show bitting selection preview in
 //       another windows
 //
@@ -198,11 +263,11 @@ void Descriptor::bitting_preview(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
     char k;
 
-    cv::namedWindow(DESCRIPTOR_WIN_NAME,
-		    cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
-
     static cv::Mat preview = cv::Mat(cv::Size(image.cols, image.rows),
 				     CV_8UC3, cv::Scalar(0, 0, 0));
+    cv::namedWindow(DESCRIPTOR_WIN_NAME,
+		    cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
+    log_wrapper("Bitting Preview", "Is the bitting correct ? Press enter to continue");
     redraw_selection(preview, bitting);
     for (;;) {
 	cv::imshow(DESCRIPTOR_WIN_NAME, preview);
@@ -215,11 +280,20 @@ void Descriptor::bitting_preview(std::function<void(std::string)> failure,
 }
 
 //
-// @desc Getter for Activity Result
+// @desc Getter for Activity Results
 //
 
 bitting_t Descriptor::get_bitting(void) {
     return bitting;
+}
+
+
+//
+// @desc Getter for Activity Results
+//
+
+std::list<cv::Rect> Descriptor::get_levers(void) {
+	return levers;
 }
 
 //
@@ -242,7 +316,8 @@ void Descriptor::start_activity(int flow) {
 	 std::function<void()>) = {
 	&Descriptor::initial_closeup,
 	&Descriptor::combinaison_capture,
-	&Descriptor::bitting_preview,
+	&Descriptor::levers_disposition,
+	&Descriptor::bitting_preview
     };
     static constexpr int n_func =
         sizeof(flow_func) / sizeof(*flow_func);
