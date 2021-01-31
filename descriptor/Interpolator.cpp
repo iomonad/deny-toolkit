@@ -10,8 +10,9 @@
 #include "Commons.hpp"
 #include "Interpolator.hpp"
 
-Interpolator::Interpolator(std::string path, bitting_t bitting)
-    : _bitting(bitting) {
+Interpolator::Interpolator(std::string path, bitting_t bitting,
+			   std::vector<cv::Rect> levers)
+	: _bitting(bitting), _levers(levers) {
     target.open(path);
 
     keyinfo.MAGIC = 0xde57de57;
@@ -48,6 +49,23 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
     return success();
 }
 
+void Interpolator::regularize_levers(std::function<void(std::string)> failure,
+				     std::function<void()> success) {
+	cv::Rect genese = _levers.front();
+	int ymin = genese.y;
+
+	for (auto &lev: _levers) {
+		lev.x -= genese.x;
+		if (lev.y < ymin) {
+			ymin = lev.y;
+		}
+	}
+	for (auto &lev : _levers) {
+		lev.y -= ymin;
+	}
+	return success();
+}
+
 void Interpolator::craft_file(std::function<void(std::string)> failure,
 			      std::function<void()> success) {
 
@@ -68,13 +86,24 @@ void Interpolator::craft_file(std::function<void(std::string)> failure,
     strncpy(keyinfo.name, combiname.c_str(), 32);
     // Pack Header
     target.write((char *) &keyinfo, sizeof(struct KeyHeader));
+    // Pack Levers
+    for (auto &l : _levers) {
+        struct KeyLever lev = {
+	    (unsigned short)l.x,
+	    (unsigned short)l.y,
+	    (unsigned short)l.width,
+	    (unsigned short)l.height
+	};
+	target.write((char*)&lev, sizeof(struct KeyLever));
+	std::cout << "L "<< l << std::endl;
+    }
     // Back Body
     for (auto &b : _bitting) {
 	struct KeyBody body = {
 	    (unsigned short)b.x,
 	    (unsigned short)b.y
 	};
-	std::cout << b << std::endl;
+	std::cout << "B "<< b << std::endl;
 	target.write((char*)&body, sizeof(struct KeyBody));
     }
     std::cout << "Succesfully saved key '" << combiname << "'" << std::endl;
@@ -95,6 +124,7 @@ void Interpolator::pack(int flow) {
 	(std::function<void(std::string)>,
 	 std::function<void()>) = {
 	&Interpolator::regularize_bitting,
+	&Interpolator::regularize_levers,
 	&Interpolator::craft_file,
     };
     static constexpr int n_func =
