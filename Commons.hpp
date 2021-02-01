@@ -39,4 +39,11 @@ struct KeyBody {
 };
 #pragma pack(pop)
 
+// Complete definition (highlevel)
+struct Key {
+	struct KeyHeader header;
+	std::vector<cv::Rect> levers;
+	std::vector<cv::Point> bitting;
+};
+
 #endif /* COMMONS_H */

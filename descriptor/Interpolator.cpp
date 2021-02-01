@@ -109,6 +109,7 @@ void Interpolator::craft_file(std::function<void(std::string)> failure,
     std::cout << "Succesfully saved key '" << combiname << "'" << std::endl;
     return success();
 }
+
 //
 // @desc Lambda throw helper, maybe useful to add
 //       some cleanup when error occur to gracefuly
