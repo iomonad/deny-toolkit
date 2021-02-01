@@ -7,7 +7,7 @@ CC = c++
 STD = gnu++14
 CFLAGS = -g -Wall -std=$(STD)
 SRCS = main.cpp Arguments.cpp Descriptor.cpp \
-       Interpolator.cpp Commons.cpp
+       Interpolator.cpp ../Commons.cpp
 TARGET = deny-descriptor
 
 OPENCV = `pkg-config opencv4 --cflags --libs`

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Commons.hpp"
+#include "../Commons.hpp"
 #include "Interpolator.hpp"
 
 Interpolator::Interpolator(std::string path, bitting_t bitting)
