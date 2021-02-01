@@ -70,6 +70,31 @@ int main(int argc, char *argv[])
 	    break;
 	}
 
+        // Levers dump
+	std::cout << std::endl << "----- BEGIN LEVERS CODE -----"
+		  << std::endl << std::endl;
+
+	// Ho shit, very horrible piece of code rigth there.
+	// Maybe declare a list of struct then map it to iostream
+	// reader to collect results idiomaticaly ?
+	KeyLever one, two, three;
+	input.read((char*)&one, sizeof(struct KeyLever));
+	input.read((char*)&two, sizeof(struct KeyLever));
+	input.read((char*)&three, sizeof(struct KeyLever));
+	std::vector<cv::Rect> levers {
+		cv::Rect(one.x, one.y, one.width, one.height),
+		cv::Rect(two.x, two.y, two.width, two.height),
+		cv::Rect(three.x, three.y, three.width, three.height)
+	};
+	for (size_t i = 0; i < 3 ; i++) {
+		cv::Rect node = levers.at(i);
+
+		std::cout << "Levers " << i << ": "
+			  << node << std::endl;
+	}
+	std::cout << std::endl << "----- END LEVERS CODE -----"
+		  << std::endl;
+
 	while (input.read((char*)&entry, sizeof(struct KeyBody))) {
 	    bitting.push_back(cv::Point(entry.x, entry.y));
 	}
