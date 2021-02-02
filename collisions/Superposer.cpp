@@ -1,4 +1,4 @@
-//
+//o
 // (c) 2020 iomonad - <iomonad@riseup.net>
 // See: https://github.com/iomonad/deny-toolkit
 //
@@ -7,6 +7,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <opencv2/core/core.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/highgui/highgui.hpp>
+
 #include "Superposer.hpp"
 
 // Basic constructor, load files into
@@ -14,35 +18,46 @@
 
 Superposer::Superposer(std::vector<std::string> fpaths) {
 	for (const auto path: fpaths) {
-		std::ifstream s;
-		s.open(path);
+		std::ifstream *s = new std::ifstream;
+		s->open(path);
 
-		if (!s.good()) {
-			s.close();
+		if (!s->good()) {
+			s->close();
 			for (const auto f: fsw)
 				f->close();
-			throw std::runtime_error("File " + path + " don't exists.");
+			throw std::runtime_error(
+				"File " + path + " don't exists.");
 		}
-		// Warning: Pointers become invalid.
-		// Be careful with object lifecycle
-		fsw.push_back(&s);
+		//
+		// This break object lifecycle, take
+		// care of ressource acquisition.
+		//
+		fsw.push_back(s);
 		std::cout << "[OK]  Loaded " << path
 			  << "." << std::endl;
 	}
+
+	// CV Setup
+	mat = cv::Mat(cv::Size(500, 500),
+		CV_8UC3, cv::Scalar(0, 0, 0));
+	cv::namedWindow("windows",
+			cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
+
 }
 
 Superposer::~Superposer() {
-	for ( auto f: fsw) {
+	for (auto f: fsw) {
 		if (f->is_open()) {
-			// To fix, segfault on free.
-			// Maybe deleted before the destructor
-			// is called ?
-			//f->close();
+			f->close();
 		}
 	}
 }
 
 
+//
+// Unpack each ifstream ref into exploitable
+// key struct.
+//
 
 void Superposer::unpack_files(std::function<void(std::string)> failure,
 			      std::function<void()> success) {
@@ -78,7 +93,66 @@ void Superposer::unpack_files(std::function<void(std::string)> failure,
 		};
 		keys.push_back(k);
 	}
-	return ;
+	return success();
+}
+
+//
+// Ensure keys share same props
+//
+
+void Superposer::ensure_assoc(std::function<void(std::string)> failure,
+			      std::function<void()> success) {
+	unsigned short comb_type = 0;
+
+	for (const auto &k : keys) {
+		if (!comb_type)
+			continue;
+		if (k.header.combinaison_type != comb_type) {
+			throw std::runtime_error("All files should have same combinaison size");
+		}
+	}
+	std::cout << "[OK]  Key correlation correct, generating collision" << std::endl;
+	return success();
+}
+
+static void draw_bitting(cv::Mat mat, std::vector<cv::Point> bitting,
+			cv::Scalar color) {
+    for (std::size_t i = 0; i < bitting.size(); ++i) {
+	if ((i + 1) != bitting.size()) {
+		cv::line(mat, bitting[i], bitting[i+1], color);
+	}
+    }
+}
+
+static void draw_levers(cv::Mat mat, std::vector<cv::Rect> levers,
+			cv::Scalar color) {
+	for (std::size_t i = 0; i < levers.size(); ++i) {
+		cv::rectangle(mat, levers.at(i), color, 3);
+	}
+}
+
+//
+// Display each combinaison with shared materializer and
+// unificated genese
+//
+
+void Superposer::process_layered_display(std::function<void(std::string)> failure,
+					 std::function<void()> success) {
+	char k;
+
+	cv::Scalar color = cv::Scalar(0, 255, 0);
+
+	for (const auto &k : keys) {
+		draw_bitting(mat, k.bitting, color);
+		draw_levers(mat, k.levers, color);
+	}
+	for (;;) {
+	    cv::imshow("windows", mat);
+	    k = cv::waitKey(100);
+	    if (k == 0x20)
+		    break;
+	}
+	return success();
 }
 
 static void raise_exception(std::string what) {
@@ -90,6 +164,8 @@ void Superposer::compute(int flow) {
 		(std::function<void(std::string)>,
 		 std::function<void()>) = {
 		&Superposer::unpack_files,
+		&Superposer::ensure_assoc,
+		&Superposer::process_layered_display
 	};
 	static constexpr int n_func =
 		sizeof(flow_func) / sizeof(*flow_func);
