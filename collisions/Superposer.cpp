@@ -1,4 +1,4 @@
-//o
+//
 // (c) 2020 iomonad - <iomonad@riseup.net>
 // See: https://github.com/iomonad/deny-toolkit
 //
@@ -40,7 +40,7 @@ Superposer::Superposer(std::vector<std::string> fpaths) {
 	// CV Setup
 	mat = cv::Mat(cv::Size(500, 500),
 		CV_8UC3, cv::Scalar(0, 0, 0));
-	cv::namedWindow("windows",
+	cv::namedWindow(SUPERP_WIN,
 			cv::WINDOW_AUTOSIZE | cv::WINDOW_GUI_NORMAL);
 
 }
@@ -126,8 +126,9 @@ static void draw_bitting(cv::Mat mat, std::vector<cv::Point> bitting,
 
 static void draw_levers(cv::Mat mat, std::vector<cv::Rect> levers,
 			cv::Scalar color) {
+	cv::Scalar lc = cv::Scalar(150, color[1], color[3]);
 	for (std::size_t i = 0; i < levers.size(); ++i) {
-		cv::rectangle(mat, levers.at(i), color, 3);
+		cv::rectangle(mat, levers.at(i), lc, 1);
 	}
 }
 
@@ -140,16 +141,16 @@ void Superposer::process_layered_display(std::function<void(std::string)> failur
 					 std::function<void()> success) {
 	char k;
 
-	cv::Scalar color = cv::Scalar(0, 255, 0);
-
-	for (const auto &k : keys) {
-		draw_bitting(mat, k.bitting, color);
-		draw_levers(mat, k.levers, color);
+	for (size_t i = 0; i < keys.size(); i++) {
+		cv::Scalar color =
+			cv::Scalar(0x0, 255 - (i * 2), 0x0);
+		draw_bitting(mat, keys[i].bitting, color);
+		draw_levers(mat, keys[i].levers, color);
 	}
 	for (;;) {
-	    cv::imshow("windows", mat);
+	    cv::imshow(SUPERP_WIN, mat);
 	    k = cv::waitKey(100);
-	    if (k == 0x20)
+	    if (k == 0x20 || k == 'q')
 		    break;
 	}
 	return success();

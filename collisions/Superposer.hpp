@@ -16,6 +16,8 @@
 
 #include "../Commons.hpp"
 
+# define SUPERP_WIN "superposer"
+
 class Superposer {
 private:
 	std::vector<std::ifstream*> fsw;
