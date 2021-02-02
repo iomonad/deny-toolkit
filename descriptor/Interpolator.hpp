@@ -20,6 +20,7 @@ private:
     std::ofstream target;
     bitting_t _bitting;
     std::vector<cv::Rect> _levers;
+    cv::Point shared_genese;
     KeyHeader keyinfo;
 
     // Flow Components

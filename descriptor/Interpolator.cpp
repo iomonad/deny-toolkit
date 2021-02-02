@@ -35,6 +35,7 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
 
     cv::Point genese = _bitting.front();
     int ymin = genese.y;
+    shared_genese = genese;
 
     // Maybe logic should be hardened ?
     for (auto &variation : _bitting) {
@@ -51,7 +52,7 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
 
 void Interpolator::regularize_levers(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
-	cv::Rect genese = _levers.front();
+	cv::Point genese = shared_genese;//_levers.front();
 	int ymin = genese.y;
 
 	for (auto &lev: _levers) {
