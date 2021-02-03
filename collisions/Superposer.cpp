@@ -141,11 +141,18 @@ void Superposer::process_layered_display(std::function<void(std::string)> failur
 					 std::function<void()> success) {
 	char k;
 
+	// TODO: Find smarter way to handle colors
+	std::vector<cv::Scalar> colors {
+		cv::Scalar (255, 0, 0),
+		cv::Scalar (0, 255, 0),
+		cv::Scalar (0, 0, 255),
+	};
+
 	for (size_t i = 0; i < keys.size(); i++) {
-		cv::Scalar color =
-			cv::Scalar(0x0, 255 - (i * 2), 0x0);
-		draw_bitting(mat, keys[i].bitting, color);
-		draw_levers(mat, keys[i].levers, color);
+		// cv::Scalar color =
+		// 	cv::Scalar(0x0, 255 - (i * 2), 0x0);
+		draw_bitting(mat, keys[i].bitting, colors[i]);
+		draw_levers(mat, keys[i].levers, colors[i]);
 	}
 	for (;;) {
 	    cv::imshow(SUPERP_WIN, mat);
