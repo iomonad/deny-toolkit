@@ -143,9 +143,12 @@ void Superposer::process_layered_display(std::function<void(std::string)> failur
 
 	// TODO: Find smarter way to handle colors
 	std::vector<cv::Scalar> colors {
-		cv::Scalar (255, 0, 0),
-		cv::Scalar (0, 255, 0),
-		cv::Scalar (0, 0, 255),
+		cv::Scalar (47, 255, 173),
+		cv::Scalar (0, 255, 255),
+		cv::Scalar (255, 255, 0),
+		cv::Scalar (60, 20, 220),
+		cv::Scalar (203, 192, 255),
+		// Maybe add more scheme ?
 	};
 
 	for (size_t i = 0; i < keys.size(); i++) {
