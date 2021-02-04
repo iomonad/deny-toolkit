@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Key.hpp"
+#include "../Commons.hpp"
 
 //
 // WARNING: HORRIBLE PIECE OF CODE JUST

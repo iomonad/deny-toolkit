@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Commons.hpp"
+#include "../Commons.hpp"
 #include "Interpolator.hpp"
 
 Interpolator::Interpolator(std::string path, bitting_t bitting,
@@ -35,6 +35,7 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
 
     cv::Point genese = _bitting.front();
     int ymin = genese.y;
+    shared_genese = genese;
 
     // Maybe logic should be hardened ?
     for (auto &variation : _bitting) {
@@ -51,7 +52,7 @@ void Interpolator::regularize_bitting(std::function<void(std::string)> failure,
 
 void Interpolator::regularize_levers(std::function<void(std::string)> failure,
 				     std::function<void()> success) {
-	cv::Rect genese = _levers.front();
+	cv::Point genese = shared_genese;//_levers.front();
 	int ymin = genese.y;
 
 	for (auto &lev: _levers) {
@@ -109,6 +110,7 @@ void Interpolator::craft_file(std::function<void(std::string)> failure,
     std::cout << "Succesfully saved key '" << combiname << "'" << std::endl;
     return success();
 }
+
 //
 // @desc Lambda throw helper, maybe useful to add
 //       some cleanup when error occur to gracefuly

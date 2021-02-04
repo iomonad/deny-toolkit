@@ -3,11 +3,14 @@
 // See: https://github.com/iomonad/deny-toolkit
 //
 
-#ifndef KEY_H
-#define KEY_H
+#ifndef COMMONS_H
+#define COMMONS_H
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
+// Bitting Data Structure
+typedef std::vector<cv::Point> bitting_t;
 
 // Key descriptor Header
 #pragma pack(push, 1)
@@ -36,4 +39,11 @@ struct KeyBody {
 };
 #pragma pack(pop)
 
-#endif /* KEY_H */
+// Complete definition (highlevel)
+struct Key {
+	struct KeyHeader header;
+	std::vector<cv::Rect> levers;
+	std::vector<cv::Point> bitting;
+};
+
+#endif /* COMMONS_H */

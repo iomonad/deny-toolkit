@@ -13,13 +13,14 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "Commons.hpp"
+#include "../Commons.hpp"
 
 class Interpolator {
 private:
     std::ofstream target;
     bitting_t _bitting;
     std::vector<cv::Rect> _levers;
+    cv::Point shared_genese;
     KeyHeader keyinfo;
 
     // Flow Components

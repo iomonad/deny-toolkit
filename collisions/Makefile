@@ -6,9 +6,8 @@
 CC = c++
 STD = gnu++14
 CFLAGS = -g -Wall -std=$(STD)
-SRCS = main.cpp Arguments.cpp Descriptor.cpp \
-       Interpolator.cpp ../Commons.cpp
-TARGET = deny-descriptor
+SRCS = main.cpp ../Commons.cpp Superposer.cpp
+TARGET = dny-collision
 
 OPENCV = `pkg-config opencv4 --cflags --libs`
 LIBS = $(OPENCV)
