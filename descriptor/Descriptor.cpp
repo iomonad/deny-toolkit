@@ -14,7 +14,8 @@
 using namespace DescriptorScope;
 
 Descriptor::Descriptor(std::string fname) {
-    image = cv::imread(fname, cv::IMREAD_GRAYSCALE);
+    // image = cv::imread(fname, cv::IMREAD_GRAYSCALE);
+    image = cv::imread(fname, cv::IMREAD_COLOR);
 
     // Deep Stock Copy
     image.copyTo(image_stock);
@@ -39,14 +40,14 @@ static void redraw_selection(cv::Mat mat, std::vector<cv::Point> bitting) {
     for (std::size_t i = 0; i < bitting.size(); ++i) {
 	if ((i + 1) != bitting.size()) {
 	    cv::line(mat, bitting[i], bitting[i+1],
-		     cv::Scalar(0, 254, 0), 2);
+		     cv::Scalar(0, 255, 0), 1);
 	}
     }
 }
 
 static void draw_levers(cv::Mat mat, std::vector<cv::Rect> levers) {
 	for (std::size_t i = 0; i < levers.size(); ++i) {
-		cv::rectangle(mat, levers.at(i), cv::Scalar(20, 100, 100), 3);
+		cv::rectangle(mat, levers.at(i), cv::Scalar(20, 100, 100), 1);
 	}
 }
 
@@ -235,7 +236,7 @@ void Descriptor::levers_disposition(std::function<void(std::string)> failure,
 		    std::get<1>(closeup).x != 0 && std::get<1>(closeup).y != 0) {
 			// Draw Closeup
 			cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
-				      cv::Scalar(0, 255, 0), 3);
+				      cv::Scalar(0, 255, 0), 1);
 		}
 	});
 	while (levers_count < 3) {
@@ -249,7 +250,7 @@ void Descriptor::levers_disposition(std::function<void(std::string)> failure,
 					cv::Rect roi(std::get<0>(closeup), std::get<1>(closeup));
 					levers.push_back(roi);
 					cv::rectangle(image, std::get<0>(closeup), std::get<1>(closeup),
-						      cv::Scalar(0, 255, 0), 3);
+						      cv::Scalar(0, 255, 0), 1);
 					image.copyTo(image_stock);
 					levers_count++;
 					log_wrapper("Levers Disposition", "Levers added");
